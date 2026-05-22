@@ -114,9 +114,27 @@ export default function OnboardingChat() {
   const [showDatePicker, setShowDatePicker] = useState(false)
   const [showFinish, setShowFinish] = useState(false)
 
+  // Auth & Guest flow states
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [authEmail, setAuthEmail] = useState('')
+  const [authPassword, setAuthPassword] = useState('')
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup')
+  const [error, setError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
+
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const hasInit = useRef(false)
+
+  // ── Mount Check for Auth ──
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setIsLoggedIn(true)
+      }
+    })
+  }, [])
 
   // ── Scroll to bottom ──
   const scrollToBottom = useCallback(() => {
@@ -241,22 +259,62 @@ export default function OnboardingChat() {
   }
 
   // ── Save to DB and redirect ──
-  async function handleFinish() {
+  async function handleFinish(emailToUse?: string, passwordToUse?: string, modeToUse?: 'signin' | 'signup') {
     setIsSaving(true)
+    setError('')
+    setSuccessMsg('')
     try {
       const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      let activeUser = null
 
-      if (!user) {
-        router.push('/login')
+      // Guest flow: perform signup or signin in flight
+      if (emailToUse && passwordToUse) {
+        if (modeToUse === 'signup') {
+          const { data, error: signUpError } = await supabase.auth.signUp({
+            email: emailToUse,
+            password: passwordToUse,
+          })
+          if (signUpError) {
+            setError(signUpError.message)
+            setIsSaving(false)
+            return
+          }
+          if (data.session) {
+            activeUser = data.user
+          } else {
+            // Verification email required
+            setSuccessMsg('Account created! Please check your email inbox to verify your account and activate your birthday wall.')
+            setIsSaving(false)
+            return
+          }
+        } else {
+          // Mode is sign in
+          const { data, error: signInError } = await supabase.auth.signInWithPassword({
+            email: emailToUse,
+            password: passwordToUse,
+          })
+          if (signInError) {
+            setError(signInError.message)
+            setIsSaving(false)
+            return
+          }
+          activeUser = data.user
+        }
+      } else {
+        // Authenticated flow
+        const { data: { user } } = await supabase.auth.getUser()
+        activeUser = user
+      }
+
+      if (!activeUser) {
+        setError('A secure account session is required to save your profile.')
+        setIsSaving(false)
         return
       }
 
       const slug = generateSlug(userData.name)
-      const { error } = await supabase.from('users').upsert({
-        id: user.id,
+      const { error: upsertError } = await supabase.from('users').upsert({
+        id: activeUser.id,
         name: userData.name,
         slug,
         city: userData.city || null,
@@ -265,15 +323,17 @@ export default function OnboardingChat() {
         vibe: userData.vibe,
       })
 
-      if (error) {
-        console.error('Failed to save profile:', error)
+      if (upsertError) {
+        console.error('Failed to save profile:', upsertError)
+        setError(upsertError.message)
         setIsSaving(false)
         return
       }
 
       router.push('/feed')
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
+      setError(err.message || 'An unexpected error occurred.')
       setIsSaving(false)
     }
   }
@@ -423,14 +483,74 @@ export default function OnboardingChat() {
                 🎂 {formatBirthday(userData.month, userData.day)}
               </div>
             )}
-            <button
-              className={styles.finishBtn}
-              onClick={handleFinish}
-              disabled={isSaving}
-              type="button"
-            >
-              {isSaving ? 'Saving…' : 'Go to my feed →'}
-            </button>
+
+            {!isLoggedIn ? (
+              <div className={styles.authWrapper}>
+                <p className={styles.authTip}>
+                  Secure your public birthday wall link with an account:
+                </p>
+                <div className={styles.authTabs}>
+                  <button
+                    type="button"
+                    className={`${styles.authTab} ${authMode === 'signup' ? styles.authTabSel : ''}`}
+                    onClick={() => { setAuthMode('signup'); setError(''); setSuccessMsg(''); }}
+                  >
+                    Create account
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.authTab} ${authMode === 'signin' ? styles.authTabSel : ''}`}
+                    onClick={() => { setAuthMode('signin'); setError(''); setSuccessMsg(''); }}
+                  >
+                    Sign in
+                  </button>
+                </div>
+
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  className={styles.authInput}
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  autoComplete="email"
+                />
+                <input
+                  type="password"
+                  placeholder={authMode === 'signup' ? 'Password (min 6 chars)' : 'Password'}
+                  className={styles.authInput}
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+
+                {error && <p className={styles.authError}>{error}</p>}
+                {successMsg && <p className={styles.authSuccess}>{successMsg}</p>}
+
+                <button
+                  className={styles.finishBtn}
+                  onClick={() => handleFinish(authEmail.trim(), authPassword, authMode)}
+                  disabled={isSaving || !authEmail.trim() || !authPassword}
+                  type="button"
+                >
+                  {isSaving
+                    ? authMode === 'signup'
+                      ? 'Creating account & saving…'
+                      : 'Signing in & saving…'
+                    : authMode === 'signup'
+                    ? 'Create account & save →'
+                    : 'Sign in & save →'}
+                </button>
+              </div>
+            ) : (
+              <button
+                className={styles.finishBtn}
+                onClick={() => handleFinish()}
+                disabled={isSaving}
+                type="button"
+              >
+                {isSaving ? 'Saving…' : 'Go to my feed →'}
+              </button>
+            )}
           </div>
         )}
 

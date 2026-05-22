@@ -16,12 +16,14 @@ export default function LoginPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   const supabase = createClient()
 
   function switchMode(next: Mode) {
     setMode(next)
     setError('')
+    setSuccessMsg('')
     setPassword('')
     setConfirmPassword('')
   }
@@ -29,6 +31,7 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
+    setSuccessMsg('')
 
     if (!email.trim() || !password.trim()) {
       setError('Please fill in all fields.')
@@ -76,7 +79,7 @@ export default function LoginPage() {
         router.push('/feed')
       } else {
         // sign up
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim(),
           password,
         })
@@ -84,8 +87,17 @@ export default function LoginPage() {
           setError(signUpError.message)
           return
         }
-        // New user — always go to onboarding
-        router.push('/join')
+        
+        if (data.session) {
+          // Instant sign-in (email confirmation off)
+          router.push('/join')
+        } else {
+          // Email confirmation pending (email confirmation on)
+          setSuccessMsg('Account created! Please check your email inbox to verify your account before logging in.')
+          setEmail('')
+          setPassword('')
+          setConfirmPassword('')
+        }
       }
     } finally {
       setLoading(false)
@@ -179,6 +191,7 @@ export default function LoginPage() {
           )}
 
           {error && <p className={styles.error}>{error}</p>}
+          {successMsg && <p className={styles.success}>{successMsg}</p>}
 
           <button
             type="submit"

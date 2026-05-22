@@ -29,10 +29,8 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Only protect /me and /join — guests can browse /feed and /u/* freely
-  const isProtected =
-    request.nextUrl.pathname.startsWith('/me') ||
-    request.nextUrl.pathname.startsWith('/join')
+  // Only protect /me — guests can browse /feed, onboarding /join, and /u/* freely
+  const isProtected = request.nextUrl.pathname.startsWith('/me')
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone()
