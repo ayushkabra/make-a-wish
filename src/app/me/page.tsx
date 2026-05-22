@@ -20,24 +20,28 @@ export default async function MePage() {
 
   if (!profile) redirect('/join')
 
-  const { data: wishes } = await supabase
-    .from('wishes')
-    .select('*, replies(*)')
-    .eq('recipient_id', user.id)
-    .order('created_at', { ascending: false })
+  const [wishesResult, twinsResult, sentCountResult] = await Promise.all([
+    supabase
+      .from('wishes')
+      .select('*, replies(*)')
+      .eq('recipient_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('users')
+      .select('*')
+      .eq('birth_month', profile.birth_month)
+      .eq('birth_day', profile.birth_day)
+      .neq('id', user.id)
+      .limit(5),
+    supabase
+      .from('wishes')
+      .select('*', { count: 'exact', head: true })
+      .eq('sender_id', user.id),
+  ])
 
-  const { data: twins } = await supabase
-    .from('users')
-    .select('*')
-    .eq('birth_month', profile.birth_month)
-    .eq('birth_day', profile.birth_day)
-    .neq('id', user.id)
-    .limit(5)
-
-  const { count: sentCount } = await supabase
-    .from('wishes')
-    .select('*', { count: 'exact', head: true })
-    .eq('sender_id', user.id)
+  const wishes = wishesResult.data
+  const twins = twinsResult.data
+  const sentCount = sentCountResult.count
 
   return (
     <>

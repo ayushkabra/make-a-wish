@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import styles from './MyPageClient.module.css'
 import InboxCard from './InboxCard'
 import { User, Wish } from '@/types'
@@ -18,10 +20,18 @@ type Tab = 'profile' | 'twins' | 'inbox'
 type InboxFilter = 'all' | 'new' | 'replied'
 
 export default function MyPageClient({ profile, wishes: initialWishes, twins, sentCount }: MyPageClientProps) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<Tab>('profile')
   const [inboxFilter, setInboxFilter] = useState<InboxFilter>('all')
   const [wishes, setWishes] = useState<Wish[]>(initialWishes)
   const [copied, setCopied] = useState(false)
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/feed')
+    router.refresh()
+  }
 
   const zodiac = getZodiac(profile.birth_month, profile.birth_day)
   const days = daysUntilBirthday(profile.birth_month, profile.birth_day)
@@ -93,6 +103,7 @@ export default function MyPageClient({ profile, wishes: initialWishes, twins, se
           </div>
           <div className={styles.avatarActions}>
             <button className={styles.btnEdit} onClick={() => {}}>Edit profile</button>
+            <button className={styles.btnSignout} onClick={handleSignOut}>Sign out</button>
           </div>
         </div>
 

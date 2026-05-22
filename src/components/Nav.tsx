@@ -17,7 +17,7 @@ export default function Nav({ user, wishCount }: NavProps) {
   return (
     <nav className={styles.nav}>
       <Link href="/feed" className={styles.logo}>
-        make a<em>wish</em>
+        make a <em>wish</em>
       </Link>
 
       <div className={styles.navRight}>

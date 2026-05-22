@@ -120,7 +120,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div className={styles.logo}>
-          make a<em>wish</em>
+          make a <em>wish</em>
         </div>
 
         {/* Heading */}

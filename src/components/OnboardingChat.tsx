@@ -171,7 +171,7 @@ export default function OnboardingChat() {
     if (hasInit.current) return
     hasInit.current = true
     setTimeout(() => {
-      addMessage({ role: 'app', text: "Hey! 👋 I'm makeawish. What's your name?" })
+      addMessage({ role: 'app', text: "Hey! 👋 I'm make a wish. What's your name?" })
       scrollToBottom()
     }, 500)
   }, [addMessage, scrollToBottom])
@@ -379,7 +379,7 @@ export default function OnboardingChat() {
           if (msg.type === 'zodiac') {
             return (
               <div key={msg.id} className={`${styles.bubbleWrap} ${styles.fromApp}`}>
-                <span className={styles.bubbleAppLabel}>makeawish</span>
+                <span className={styles.bubbleAppLabel}>make a wish</span>
                 <ZodiacBubble month={userData.month} day={userData.day} />
               </div>
             )
@@ -393,7 +393,7 @@ export default function OnboardingChat() {
               }`}
             >
               {msg.role === 'app' && (
-                <span className={styles.bubbleAppLabel}>makeawish</span>
+                <span className={styles.bubbleAppLabel}>make a wish</span>
               )}
               <div
                 className={`${styles.bubble} ${
@@ -409,7 +409,7 @@ export default function OnboardingChat() {
         {/* Typing indicator */}
         {isTyping && (
           <div className={`${styles.bubbleWrap} ${styles.fromApp}`}>
-            <span className={styles.bubbleAppLabel}>makeawish</span>
+            <span className={styles.bubbleAppLabel}>make a wish</span>
             <TypingIndicator />
           </div>
         )}

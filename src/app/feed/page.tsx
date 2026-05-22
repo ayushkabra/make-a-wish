@@ -57,32 +57,39 @@ export default async function FeedPage() {
   }
 
   const today = new Date()
-  const tomorrow = addDays(today, 1)
 
-  // Fetch today and tomorrow
-  const [todayPeople, tomorrowPeople] = await Promise.all([
-    fetchByDate(supabase, today.getMonth() + 1, today.getDate()),
-    fetchByDate(supabase, tomorrow.getMonth() + 1, tomorrow.getDate()),
+  // Prepare promises for all 8 days (today = 0, tomorrow = 1, week = 2..7)
+  const dayPromises = Array.from({ length: 8 }).map((_, i) => {
+    const d = addDays(today, i)
+    return fetchByDate(supabase, d.getMonth() + 1, d.getDate())
+  })
+
+  // Prepare wish count promise concurrently if currentUser exists
+  const wishCountPromise = currentUser
+    ? supabase
+        .from('wishes')
+        .select('id', { count: 'exact', head: true })
+        .eq('recipient_id', currentUser.id)
+    : Promise.resolve({ count: 0 })
+
+  // Resolve all concurrently
+  const [allDaysPeople, wishCountResult] = await Promise.all([
+    Promise.all(dayPromises),
+    wishCountPromise,
   ])
 
-  // Fetch this week (days 2–7, deduped)
+  const todayPeople = allDaysPeople[0]
+  const tomorrowPeople = allDaysPeople[1]
+
+  // Construct weekPeople list from days 2–7 (deduplicated)
   const weekSet = new Map<string, PersonWithCount>()
   for (let i = 2; i <= 7; i++) {
-    const d = addDays(today, i)
-    const people = await fetchByDate(supabase, d.getMonth() + 1, d.getDate())
+    const people = allDaysPeople[i]
     people.forEach((p) => weekSet.set(p.id, p))
   }
   const weekPeople = Array.from(weekSet.values())
 
-  // Wish count for nav badge (unread wishes for the current user's profile)
-  let wishCount = 0
-  if (currentUser) {
-    const { count } = await supabase
-      .from('wishes')
-      .select('id', { count: 'exact', head: true })
-      .eq('recipient_id', currentUser.id)
-    wishCount = count ?? 0
-  }
+  const wishCount = wishCountResult.count ?? 0
 
   return (
     <>

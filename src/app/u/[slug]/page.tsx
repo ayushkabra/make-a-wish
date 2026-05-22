@@ -16,40 +16,45 @@ export default async function PublicProfilePage({ params }: PageProps) {
   const { slug } = await params
   const supabase = await createClient()
 
-  // Get current user session (optional — page works without auth)
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser()
-
-  let currentUser = null
-  if (authUser) {
-    const { data } = await supabase
+  // Stage 1: Fetch auth user session and the target profile person concurrently
+  const [authUserResult, personResult] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
       .from('users')
       .select('*')
-      .eq('id', authUser.id)
-      .single()
-    currentUser = data
-  }
+      .eq('slug', slug)
+      .single(),
+  ])
 
-  // Fetch the profile person
-  const { data: person, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('slug', slug)
-    .single()
+  const authUser = authUserResult.data?.user
+  const person = personResult.data
 
-  if (error || !person) {
+  if (personResult.error || !person) {
     notFound()
   }
 
-  // Fetch all wishes for this person
-  const { data: wishesRaw } = await supabase
+  // Stage 2: Fetch authenticated user's profile details and wishes concurrently
+  const currentUserPromise = authUser
+    ? supabase
+        .from('users')
+        .select('*')
+        .eq('id', authUser.id)
+        .single()
+    : Promise.resolve({ data: null })
+
+  const wishesPromise = supabase
     .from('wishes')
     .select('*, replies(*)')
     .eq('recipient_id', person.id)
     .order('created_at', { ascending: false })
 
-  const wishes: Wish[] = wishesRaw ?? []
+  const [currentUserResult, wishesResult] = await Promise.all([
+    currentUserPromise,
+    wishesPromise,
+  ])
+
+  const currentUser = currentUserResult.data
+  const wishes: Wish[] = wishesResult.data ?? []
 
   const initials = getInitials(person.name)
   const avatarColor = getAvatarColor(0)
