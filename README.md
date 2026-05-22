@@ -1,36 +1,106 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# make a*wish* 🎂
 
-## Getting Started
+A premium, modern birthday-wishing social application built with **Next.js 14/15 (App Router)** and **Supabase**. Discover birthday twins, build wishing streaks, write anonymous or authenticated wishes on public wish walls, and track countdowns to your favorite people's birthdays.
 
-First, run the development server:
+Designed with elegant typography (Fraunces & Outfit), glassmorphism styling, and custom zodiac reveals.
+
+---
+
+## ✨ Features
+
+- **🎂 Live Birthday Feed**: Browse active birthdays for Today, Tomorrow, and This Week.
+- **✨ Micro-Interactive Onboarding**: A gorgeous chat-bubble flow that guides new users through setting up their name, city, birth date, and personality vibe.
+- **♈ Animated Zodiac Cards**: Automatically reveals the user's zodiac sign, elemental category, dates, key trait, and a fun celestial fact.
+- **✉️ Dynamic Wish Wall**: Send anonymous or authenticated wishes. Recipients can "love" wishes and reply directly.
+- **🔥 Streaks & Stats**: Track your birthday-wishing streak and see stats (Wishes Sent, Wishes Received, Twins Found).
+- **♊ Birthday Twins**: Automatically matches you with users sharing the same birth month and day!
+- **🔒 Secure Architecture**: Robust Supabase Row-Level Security (RLS) policies protecting user profiles and inbox interactions.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js](https://nextjs.org/) (App Router, dynamic page SSR & Route Handlers)
+- **Styling**: Vanilla CSS Modules (harmonious coral, cream, and deep slate theme, premium glassmorphism)
+- **Database & Auth**: [Supabase](https://supabase.com/) (PostgreSQL, Client-side & Server-side SSR helper clients)
+- **Auth Flow**: Secure Email + Password credentials (login is entirely optional to browse and send wishes)
+- **Realtime**: PostgreSQL Replication for live wish-wall updates
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone & Install Dependencies
+
+```bash
+cd borntoday
+npm install
+```
+
+### 2. Set Up Supabase Database
+
+1. Create a new project on [Supabase Console](https://supabase.com/).
+2. Navigate to **SQL Editor** -> **New query**.
+3. Copy the contents of [`supabase/schema.sql`](file:///c:/Users/ayush/OneDrive/Desktop/Birthday%20Directory/borntoday/supabase/schema.sql) and paste them into the SQL editor.
+4. Click **Run** to set up tables, indexes, views, and RLS policies.
+
+*(Optional)* If you want real-time updates when someone sends a wish, go to **Database -> Replication** in the Supabase Dashboard, and enable the `wishes` and `replies` tables for the `supabase_realtime` publication.
+
+### 3. Configure Environment Variables
+
+Create a file named `.env.local` in the project root (you can copy `.env.local.example`):
+
+```env
+# Project URL & Public Key (Found in Supabase -> Settings -> API)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-public-key-here
+
+# Site URL (Used for auth redirects)
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 4. Run Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📁 Project Structure
 
-## Learn More
+```text
+borntoday/
+├── public/                 # Static assets (fonts, icons)
+├── supabase/
+│   └── schema.sql          # Database tables, policies, views & functions
+├── src/
+│   ├── app/                # Next.js App Router pages
+│   │   ├── api/            # API Route Handlers (users, wishes, replies)
+│   │   ├── auth/           # Auth redirect callback handler
+│   │   ├── feed/           # Main birthday feed
+│   │   ├── join/           # Interactive onboarding chat
+│   │   ├── login/          # Custom tabbed Sign In / Sign Up page
+│   │   ├── me/             # User's personal dashboard (Inbox, Twins, Stats)
+│   │   ├── u/[slug]/       # Public wish wall pages
+│   │   ├── globals.css     # Global theme tokens, typography, and utility classes
+│   │   └── layout.tsx      # Root layout & Google Fonts integration
+│   ├── components/         # Premium modular UI components (ZodiacCard, OnboardingChat, etc.)
+│   ├── lib/                # Utility helpers (zodiac calculator, dates, supabase engines)
+│   └── types/              # Unified TypeScript definitions (User, Wish, Reply)
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎨 Visual Design System
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`makeawish` uses a highly tailored design language:
+- **Serif Typography**: `Fraunces` for headings, adding a warm, human, editorial aesthetic.
+- **Sans-Serif Typography**: `Outfit` for clean, readable body copy and metrics.
+- **Harmonious Palette**:
+  - Deep warm charcoal (`#1e1c1b`) and soft warm off-black background.
+  - Creamy overlays (`rgba(255, 255, 255, 0.05)`) with backdrop-blur.
+  - Vibrant coral accents (`#ff6e54` / `#ff846f`) for primary actions and wishes.
+  - Pure golden accents (`#ffd700`) for celebratory elements and stars.

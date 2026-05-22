@@ -1,0 +1,82 @@
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  border-bottom: 0.5px solid var(--bd);
+  background: rgba(250, 248, 245, 0.92);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(10px);
+}
+
+.logo {
+  font-family: 'Fraunces', serif;
+  font-size: 21px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.logo em {
+  color: var(--coral);
+  font-style: italic;
+}
+
+.navRight {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btnGhost {
+  background: transparent;
+  border: 0.5px solid var(--bdm);
+  border-radius: var(--rs);
+  padding: 7px 15px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--t2);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btnGhost:hover {
+  background: white;
+  color: var(--text);
+}
+
+.btnPrimary {
+  background: var(--coral);
+  color: white;
+  border: none;
+  border-radius: var(--rs);
+  padding: 7px 16px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btnPrimary:hover {
+  opacity: 0.88;
+}
+
+.badge {
+  background: var(--coral);
+  color: white;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  margin-left: 3px;
+}

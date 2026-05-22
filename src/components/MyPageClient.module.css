@@ -1,0 +1,515 @@
+.page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ── COVER ── */
+.cover {
+  height: 130px;
+  position: relative;
+  overflow: hidden;
+}
+.coverGrad {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #1a1614 0%, #3d1f12 45%, #c9502a 100%);
+}
+.coverRing1 {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  border: 36px solid rgba(255, 255, 255, 0.04);
+  top: -80px;
+  right: -50px;
+}
+.coverRing2 {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 24px solid rgba(201, 80, 42, 0.15);
+  bottom: -55px;
+  left: 30px;
+}
+.coverZodiac {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  font-size: 56px;
+  opacity: 0.18;
+}
+.coverQuote {
+  position: absolute;
+  bottom: 14px;
+  left: 22px;
+  font-family: 'Fraunces', serif;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 300;
+}
+
+/* ── IDENTITY ── */
+.identity {
+  padding: 0 22px;
+  margin-bottom: 20px;
+}
+.avatarRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: -32px;
+  margin-bottom: 13px;
+}
+.avatar {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 500;
+  border: 3px solid var(--bg);
+  position: relative;
+}
+.a1 { background: #faece7; color: #993c1d; }
+.a2 { background: #e1f5ee; color: #0f6e56; }
+.a3 { background: #e6f1fb; color: #185fa5; }
+.a4 { background: #eeedfe; color: #534ab7; }
+.a5 { background: #faeeda; color: #854f0b; }
+
+.zodiacBadge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: var(--coral);
+  color: white;
+  font-size: 15px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--bg);
+}
+.avatarActions {
+  display: flex;
+  gap: 7px;
+  padding-top: 9px;
+}
+.btnEdit {
+  background: var(--card);
+  border: 0.5px solid var(--bdm);
+  border-radius: var(--rs);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--t2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btnEdit:hover {
+  border-color: var(--coral);
+  color: var(--coral);
+}
+.myName {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: -0.5px;
+}
+.myLoc {
+  font-size: 13px;
+  color: var(--t2);
+  margin-top: 4px;
+}
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+.tagBday {
+  background: var(--cl);
+  color: var(--coral);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tagZodiac {
+  background: #eef2ff;
+  color: #4b5fa6;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tagMember {
+  background: var(--bg);
+  color: var(--t3);
+  border: 0.5px solid var(--bdm);
+  font-weight: 400;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+}
+.myBio {
+  font-size: 14px;
+  color: var(--t2);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* ── COUNTDOWN ── */
+.countdown {
+  background: linear-gradient(135deg, var(--coral), #e8836a);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin: 0 22px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.cdDays {
+  font-family: 'Fraunces', serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: white;
+  line-height: 1;
+}
+.cdLabel {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 2px;
+}
+.cdWishes {
+  font-size: 22px;
+  color: white;
+  font-family: 'Fraunces', serif;
+  font-weight: 300;
+}
+.cdWLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 2px;
+}
+
+/* ── STATS ── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--bd);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin: 0 22px 22px;
+}
+.stat {
+  background: var(--card);
+  padding: 15px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.stat:hover {
+  background: #fef9f7;
+}
+.statNum {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 300;
+}
+.statLabel {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+/* ── STREAK ── */
+.streak {
+  background: var(--card);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  margin: 0 22px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.streakFire {
+  font-size: 28px;
+}
+.streakInfo {
+  flex: 1;
+}
+.streakN {
+  font-size: 15px;
+  font-weight: 500;
+}
+.streakS {
+  font-size: 12px;
+  color: var(--t2);
+  margin-top: 1px;
+}
+.streakDays {
+  display: flex;
+  gap: 5px;
+}
+.sday {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 0.5px solid var(--bdm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--t3);
+}
+.sdayDone {
+  background: var(--cl);
+  border-color: var(--cm);
+  color: var(--coral);
+}
+.sdayToday {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: white;
+  font-weight: 500;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex;
+  border-bottom: 0.5px solid var(--bd);
+  margin: 0 22px 22px;
+}
+.tab {
+  font-size: 13px;
+  padding: 7px 12px 10px;
+  cursor: pointer;
+  color: var(--t3);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: 'DM Sans', sans-serif;
+}
+.tabActive {
+  color: var(--coral);
+  border-bottom-color: var(--coral);
+  font-weight: 500;
+}
+.panel {
+  padding: 0 22px;
+}
+
+/* ── PROFILE TAB ── */
+.zodiacStrip {
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  border-radius: var(--r);
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+.zodiacIcon {
+  font-size: 38px;
+  flex-shrink: 0;
+}
+.zodiacName {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 300;
+  color: white;
+  letter-spacing: -0.2px;
+}
+.zodiacTrait {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 3px;
+  line-height: 1.5;
+}
+.shareBox {
+  background: var(--card);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--r);
+  padding: 16px 18px;
+}
+.shareLabel {
+  font-size: 12px;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 10px;
+}
+.shareUrl {
+  font-size: 12px;
+  color: var(--t3);
+  background: var(--bg);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--rs);
+  padding: 5px 10px;
+  margin-bottom: 12px;
+  font-family: monospace;
+}
+.btnCopy {
+  background: var(--cl);
+  border: 0.5px solid var(--cm);
+  color: var(--coral);
+  border-radius: var(--rs);
+  padding: 7px 16px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btnCopy:hover {
+  background: var(--coral);
+  color: white;
+}
+
+/* ── TWINS TAB ── */
+.twinsIntro {
+  font-size: 14px;
+  color: var(--t2);
+  margin-bottom: 14px;
+}
+.twinCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.twinCard:hover {
+  border-color: var(--cm);
+}
+.twinAvatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.twinInfo {
+  flex: 1;
+}
+.twinName {
+  font-size: 15px;
+  font-weight: 500;
+}
+.twinCity {
+  font-size: 12px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+.btnWishTwin {
+  background: var(--cl);
+  border: 0.5px solid var(--cm);
+  color: var(--coral);
+  border-radius: var(--rs);
+  padding: 7px 13px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btnWishTwin:hover {
+  background: var(--coral);
+  color: white;
+}
+
+/* ── INBOX TAB ── */
+.inboxHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.inboxTitle {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 300;
+}
+.inboxSub {
+  font-size: 13px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+.filters {
+  display: flex;
+  gap: 7px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filterPill {
+  background: var(--bg);
+  border: 0.5px solid var(--bdm);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 13px;
+  color: var(--t2);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.filterActive {
+  background: var(--cl);
+  border-color: var(--cm);
+  color: var(--coral);
+  font-weight: 500;
+}
+
+/* ── EMPTY STATE ── */
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+}
+.emptyIcon {
+  font-size: 44px;
+  margin-bottom: 12px;
+}
+.emptyTitle {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 300;
+  margin-bottom: 6px;
+}
+.emptySub {
+  font-size: 14px;
+  color: var(--t3);
+  line-height: 1.6;
+}

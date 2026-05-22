@@ -1,0 +1,212 @@
+.card {
+  background: var(--card);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.cardFresh {
+  border-color: var(--cm);
+  background: #fffbf9;
+}
+.top {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 11px;
+}
+.senderAv {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.anonAv {
+  background: var(--bg);
+  color: var(--t3);
+  border: 0.5px solid var(--bdm);
+  font-size: 16px;
+}
+.a1 { background: #faece7; color: #993c1d; }
+.a2 { background: #e1f5ee; color: #0f6e56; }
+.a3 { background: #e6f1fb; color: #185fa5; }
+.a4 { background: #eeedfe; color: #534ab7; }
+.a5 { background: #faeeda; color: #854f0b; }
+
+.senderMeta {
+  flex: 1;
+}
+.senderName {
+  font-size: 14px;
+  font-weight: 500;
+}
+.senderTime {
+  font-size: 12px;
+  color: var(--t3);
+}
+.newPip {
+  background: var(--coral);
+  color: white;
+  font-size: 10px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 2px 7px;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.wishText {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.65;
+  font-style: italic;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.actions {
+  display: flex;
+  gap: 7px;
+}
+.btnReply {
+  background: var(--cl);
+  border: 0.5px solid var(--cm);
+  color: var(--coral);
+  border-radius: var(--rs);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.btnReply:hover:not(:disabled) {
+  background: var(--coral);
+  color: white;
+}
+.btnReplyDone {
+  opacity: 0.4;
+  cursor: default;
+}
+.btnLove {
+  background: transparent;
+  border: 0.5px solid var(--bdm);
+  border-radius: var(--rs);
+  padding: 6px 11px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--t2);
+}
+.btnLove:hover {
+  border-color: var(--cm);
+  color: var(--coral);
+}
+.btnLoveon {
+  color: var(--coral);
+  border-color: var(--cm);
+}
+
+/* ── SENT REPLY ── */
+.sentReply {
+  margin-top: 9px;
+  border-top: 0.5px solid var(--bd);
+  padding-top: 11px;
+  display: flex;
+  gap: 7px;
+}
+.srAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--cl);
+  color: var(--coral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.srBubble {
+  background: var(--cl);
+  border-radius: 0 var(--rs) var(--rs) var(--rs);
+  padding: 8px 11px;
+  font-size: 13px;
+  color: var(--coral);
+  line-height: 1.5;
+  flex: 1;
+}
+.srLabel {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 4px;
+}
+
+/* ── REPLY BOX ── */
+.replyBox {
+  margin-top: 11px;
+  border-top: 0.5px solid var(--bd);
+  padding-top: 12px;
+}
+.replyTextarea {
+  width: 100%;
+  min-height: 68px;
+  border: 0.5px solid var(--bdm);
+  border-radius: var(--rs);
+  padding: 9px 11px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  resize: none;
+  outline: none;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+.replyTextarea:focus {
+  border-color: var(--coral);
+}
+.replyActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 7px;
+}
+.btnCancel {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--t3);
+  cursor: pointer;
+  padding: 5px 9px;
+  font-family: 'DM Sans', sans-serif;
+}
+.btnCancel:hover {
+  color: var(--t2);
+}
+.btnSend {
+  background: var(--coral);
+  color: white;
+  border: none;
+  border-radius: var(--rs);
+  padding: 6px 15px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btnSend:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.btnSend:hover:not(:disabled) {
+  opacity: 0.88;
+}
