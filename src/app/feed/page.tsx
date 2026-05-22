@@ -1,6 +1,7 @@
 import Nav from '@/components/Nav'
 import FeedClient from '@/components/FeedClient'
-import { createClient } from '@/lib/supabase/server'
+import { cookies } from 'next/headers'
+import { adminAuth, adminDb } from '@/lib/firebase/server'
 import type { User } from '@/types'
 
 interface PersonWithCount extends User {
@@ -16,44 +17,55 @@ function addDays(date: Date, n: number): Date {
 
 // Fetch users whose birthday is on a specific month/day
 async function fetchByDate(
-  supabase: Awaited<ReturnType<typeof createClient>>,
   month: number,
   day: number
 ): Promise<PersonWithCount[]> {
-  const { data, error } = await supabase
-    .from('users')
-    .select('*, wishes(count)')
-    .eq('birth_month', month)
-    .eq('birth_day', day)
-    .order('name', { ascending: true })
+  const snapshot = await adminDb.collection('users')
+    .where('birth_month', '==', month)
+    .where('birth_day', '==', day)
+    .get()
 
-  if (error || !data) return []
+  if (snapshot.empty) return []
 
-  return data.map((u: Record<string, unknown>) => ({
-    ...u,
-    wish_count:
-      Array.isArray(u.wishes) && u.wishes[0]
-        ? (u.wishes[0] as { count: number }).count
-        : 0,
-  })) as PersonWithCount[]
+  const people = snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as User[]
+
+  const peopleWithCount = await Promise.all(
+    people.map(async (u) => {
+      const countSnap = await adminDb.collection('wishes')
+        .where('recipient_id', '==', u.id)
+        .count()
+        .get()
+      return {
+        ...u,
+        wish_count: countSnap.data().count || 0,
+      } as PersonWithCount
+    })
+  )
+
+  return peopleWithCount.sort((a, b) => a.name.localeCompare(b.name))
 }
 
 export default async function FeedPage() {
-  const supabase = await createClient()
-
-  // Get current user (optional)
-  const {
-    data: { user: authUser },
-  } = await supabase.auth.getUser()
+  const cookieStore = await cookies()
+  const session = cookieStore.get('session')?.value
 
   let currentUser: User | null = null
-  if (authUser) {
-    const { data } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', authUser.id)
-      .single()
-    currentUser = data
+  if (session) {
+    try {
+      const decodedClaims = await adminAuth.verifySessionCookie(session, true)
+      const userDoc = await adminDb.collection('users').doc(decodedClaims.uid).get()
+      if (userDoc.exists) {
+        currentUser = {
+          id: userDoc.id,
+          ...userDoc.data(),
+        } as User
+      }
+    } catch (e) {
+      console.error('Session verification error:', e)
+    }
   }
 
   const today = new Date()
@@ -61,16 +73,16 @@ export default async function FeedPage() {
   // Prepare promises for all 8 days (today = 0, tomorrow = 1, week = 2..7)
   const dayPromises = Array.from({ length: 8 }).map((_, i) => {
     const d = addDays(today, i)
-    return fetchByDate(supabase, d.getMonth() + 1, d.getDate())
+    return fetchByDate(d.getMonth() + 1, d.getDate())
   })
 
   // Prepare wish count promise concurrently if currentUser exists
   const wishCountPromise = currentUser
-    ? supabase
-        .from('wishes')
-        .select('id', { count: 'exact', head: true })
-        .eq('recipient_id', currentUser.id)
-    : Promise.resolve({ count: 0 })
+    ? adminDb.collection('wishes')
+        .where('recipient_id', '==', currentUser.id)
+        .count()
+        .get()
+    : Promise.resolve(null)
 
   // Resolve all concurrently
   const [allDaysPeople, wishCountResult] = await Promise.all([
@@ -89,7 +101,7 @@ export default async function FeedPage() {
   }
   const weekPeople = Array.from(weekSet.values())
 
-  const wishCount = wishCountResult.count ?? 0
+  const wishCount = wishCountResult ? (wishCountResult.data().count || 0) : 0
 
   return (
     <>

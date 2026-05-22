@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { auth } from '@/lib/firebase/client'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
 import { getZodiac } from '@/lib/zodiac'
 import styles from './OnboardingChat.module.css'
 
@@ -129,12 +130,10 @@ export default function OnboardingChat() {
 
   // ── Mount Check for Auth ──
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        setIsLoggedIn(true)
-      }
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsLoggedIn(!!user)
     })
+    return () => unsubscribe()
   }, [])
 
   // ── Scroll to bottom ──
@@ -265,46 +264,44 @@ export default function OnboardingChat() {
     setError('')
     setSuccessMsg('')
     try {
-      const supabase = createClient()
-      let activeUser = null
+      let activeUser: any = null
 
       // Guest flow: perform signup or signin in flight
       if (emailToUse && passwordToUse) {
         if (modeToUse === 'signup') {
-          const { data, error: signUpError } = await supabase.auth.signUp({
-            email: emailToUse,
-            password: passwordToUse,
-          })
-          if (signUpError) {
-            setError(signUpError.message)
-            setIsSaving(false)
-            return
-          }
-          if (data.session) {
-            activeUser = data.user
-          } else {
-            // Verification email required
-            setSuccessMsg('Account created! Please check your email inbox to verify your account and activate your birthday wall.')
-            setIsSaving(false)
-            return
-          }
+          const userCredential = await createUserWithEmailAndPassword(auth, emailToUse, passwordToUse)
+          activeUser = userCredential.user
         } else {
           // Mode is sign in
-          const { data, error: signInError } = await supabase.auth.signInWithPassword({
-            email: emailToUse,
-            password: passwordToUse,
-          })
-          if (signInError) {
-            setError(signInError.message)
-            setIsSaving(false)
-            return
-          }
-          activeUser = data.user
+          const userCredential = await signInWithEmailAndPassword(auth, emailToUse, passwordToUse)
+          activeUser = userCredential.user
+        }
+
+        // Establish the Next.js session cookie
+        const idToken = await activeUser.getIdToken()
+        const res = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        })
+
+        if (!res.ok) {
+          const data = await res.json()
+          setError(data.error || 'Failed to establish auth session.')
+          setIsSaving(false)
+          return
         }
       } else {
         // Authenticated flow
-        const { data: { user } } = await supabase.auth.getUser()
-        activeUser = user
+        activeUser = auth.currentUser
+        if (activeUser) {
+          const idToken = await activeUser.getIdToken()
+          await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken }),
+          })
+        }
       }
 
       if (!activeUser) {
@@ -314,24 +311,30 @@ export default function OnboardingChat() {
       }
 
       const slug = generateSlug(userData.name)
-      const { error: upsertError } = await supabase.from('users').upsert({
-        id: activeUser.id,
-        name: userData.name,
-        slug,
-        city: userData.city || null,
-        birth_month: userData.month,
-        birth_day: userData.day,
-        vibe: userData.vibe,
+      // Call secure POST /api/me API instead of client-side Firestore/Supabase upsert!
+      const profileRes = await fetch('/api/me', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userData.name,
+          slug,
+          city: userData.city || null,
+          birth_month: userData.month,
+          birth_day: userData.day,
+          vibe: userData.vibe,
+        }),
       })
 
-      if (upsertError) {
-        console.error('Failed to save profile:', upsertError)
-        setError(upsertError.message)
+      if (!profileRes.ok) {
+        const data = await profileRes.json()
+        console.error('Failed to save profile:', data.error)
+        setError(data.error || 'Failed to save profile.')
         setIsSaving(false)
         return
       }
 
       router.push('/feed')
+      router.refresh()
     } catch (err: any) {
       console.error(err)
       setError(err.message || 'An unexpected error occurred.')

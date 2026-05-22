@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { auth } from '@/lib/firebase/client'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
 import styles from './page.module.css'
 
 type Mode = 'signin' | 'signup'
@@ -20,8 +21,6 @@ export default function LoginPage() {
 
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-
-  const supabase = createClient()
 
   function switchMode(next: Mode) {
     setMode(next)
@@ -58,54 +57,56 @@ export default function LoginPage() {
 
     try {
       if (mode === 'signin') {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
+        const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password)
+        const idToken = await userCredential.user.getIdToken()
+
+        // Create secure session cookie
+        const res = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
         })
-        if (signInError) {
-          setError(signInError.message)
+
+        if (!res.ok) {
+          const data = await res.json()
+          setError(data.error || 'Failed to establish auth session.')
           return
         }
+
         // Check if user has a profile
-        const {
-          data: { user },
-        } = await supabase.auth.getUser()
-        if (user) {
-          const { data: profile } = await supabase
-            .from('users')
-            .select('id')
-            .eq('id', user.id)
-            .single()
-          if (!profile) {
-            router.push('/join')
-            return
-          }
-        }
-        router.push('/feed')
-      } else {
-        // sign up
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-        })
-        if (signUpError) {
-          setError(signUpError.message)
+        const meRes = await fetch('/api/me')
+        if (meRes.status === 404) {
+          router.push('/join')
+          router.refresh()
           return
         }
-        
-        if (data.session) {
-          // Instant sign-in (email confirmation off)
-          router.push('/join')
-        } else {
-          // Email confirmation pending (email confirmation on)
-          setSuccessMsg('Account created! Please check your email inbox to verify your account before logging in.')
-          setEmail('')
-          setPassword('')
-          setConfirmPassword('')
-          setShowPassword(false)
-          setShowConfirmPassword(false)
+
+        router.push('/feed')
+        router.refresh()
+      } else {
+        // Sign up
+        const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password)
+        const idToken = await userCredential.user.getIdToken()
+
+        // Create secure session cookie
+        const res = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idToken }),
+        })
+
+        if (!res.ok) {
+          const data = await res.json()
+          setError(data.error || 'Failed to establish auth session.')
+          return
         }
+
+        router.push('/join')
+        router.refresh()
       }
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message || 'Authentication failed. Please check credentials.')
     } finally {
       setLoading(false)
     }

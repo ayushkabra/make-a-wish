@@ -1,60 +1,67 @@
 import { notFound } from 'next/navigation'
+import { cookies } from 'next/headers'
 import Nav from '@/components/Nav'
 import PublicProfileClient from '@/components/PublicProfileClient'
-import { createClient } from '@/lib/supabase/server'
+import { adminAuth, adminDb } from '@/lib/firebase/server'
 import { getInitials, getAvatarColor, formatBirthday, timeAgo } from '@/lib/utils'
 import { getZodiac } from '@/lib/zodiac'
 import styles from './page.module.css'
 import Link from 'next/link'
-import type { Wish } from '@/types'
+import type { User, Wish } from '@/types'
 
 interface PageProps {
   params: Promise<{ slug: string }>
 }
 
+function serializeDoc<T>(doc: any): T {
+  const data = doc.data()
+  const serialized = { ...data, id: doc.id }
+  if (serialized.created_at && typeof serialized.created_at.toDate === 'function') {
+    serialized.created_at = serialized.created_at.toDate().toISOString()
+  }
+  return serialized as T
+}
+
 export default async function PublicProfilePage({ params }: PageProps) {
   const { slug } = await params
-  const supabase = await createClient()
 
-  // Stage 1: Fetch auth user session and the target profile person concurrently
-  const [authUserResult, personResult] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase
-      .from('users')
-      .select('*')
-      .eq('slug', slug)
-      .single(),
-  ])
+  // Fetch the target profile person
+  const personQuery = await adminDb.collection('users')
+    .where('slug', '==', slug)
+    .limit(1)
+    .get()
 
-  const authUser = authUserResult.data?.user
-  const person = personResult.data
-
-  if (personResult.error || !person) {
+  if (personQuery.empty) {
     notFound()
   }
 
-  // Stage 2: Fetch authenticated user's profile details and wishes concurrently
-  const currentUserPromise = authUser
-    ? supabase
-        .from('users')
-        .select('*')
-        .eq('id', authUser.id)
-        .single()
-    : Promise.resolve({ data: null })
+  const personDoc = personQuery.docs[0]
+  const person = serializeDoc<User>(personDoc)
 
-  const wishesPromise = supabase
-    .from('wishes')
-    .select('*, replies(*)')
-    .eq('recipient_id', person.id)
-    .order('created_at', { ascending: false })
+  // Fetch auth user session from cookie
+  const cookieStore = await cookies()
+  const session = cookieStore.get('session')?.value
 
-  const [currentUserResult, wishesResult] = await Promise.all([
-    currentUserPromise,
-    wishesPromise,
-  ])
+  let currentUser: User | null = null
+  if (session) {
+    try {
+      const decodedClaims = await adminAuth.verifySessionCookie(session, true)
+      const userDoc = await adminDb.collection('users').doc(decodedClaims.uid).get()
+      if (userDoc.exists) {
+        currentUser = serializeDoc<User>(userDoc)
+      }
+    } catch (e) {
+      console.error('Session verification error:', e)
+    }
+  }
 
-  const currentUser = currentUserResult.data
-  const wishes: Wish[] = wishesResult.data ?? []
+  // Fetch wishes for the person
+  const wishesSnap = await adminDb.collection('wishes')
+    .where('recipient_id', '==', person.id)
+    .orderBy('created_at', 'desc')
+    .get()
+
+  const wishes: Wish[] = wishesSnap.docs.map((doc) => serializeDoc<Wish>(doc))
 
   const initials = getInitials(person.name)
   const avatarColor = getAvatarColor(0)

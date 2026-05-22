@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { auth } from '@/lib/firebase/client'
+import { signOut } from 'firebase/auth'
 import styles from './MyPageClient.module.css'
 import InboxCard from './InboxCard'
 import { User, Wish } from '@/types'
@@ -27,8 +28,8 @@ export default function MyPageClient({ profile, wishes: initialWishes, twins, se
   const [copied, setCopied] = useState(false)
 
   async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
+    await signOut(auth)
+    await fetch('/api/auth/session', { method: 'DELETE' })
     router.push('/feed')
     router.refresh()
   }

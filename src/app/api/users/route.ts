@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { adminDb } from '@/lib/firebase/server'
+
+function serializeDoc<T>(doc: any): T {
+  const data = doc.data()
+  const serialized = { ...data, id: doc.id }
+  if (serialized.created_at && typeof serialized.created_at.toDate === 'function') {
+    serialized.created_at = serialized.created_at.toDate().toISOString()
+  }
+  return serialized as T
+}
 
 // GET /api/users?month=5&day=22
 // GET /api/users?slug=ayush-k
@@ -10,29 +19,28 @@ export async function GET(request: NextRequest) {
     const month = searchParams.get('month')
     const day = searchParams.get('day')
 
-    const supabase = await createClient()
-
     // ── Single user by slug ──
     if (slug) {
-      const { data: user, error } = await supabase
-        .from('users')
-        .select('*, wishes(count)')
-        .eq('slug', slug)
-        .single()
+      const snapshot = await adminDb.collection('users')
+        .where('slug', '==', slug)
+        .limit(1)
+        .get()
 
-      if (error || !user) {
+      if (snapshot.empty) {
         return NextResponse.json({ error: 'User not found.' }, { status: 404 })
       }
 
-      const withCount = {
-        ...user,
-        wish_count:
-          Array.isArray(user.wishes) && user.wishes[0]
-            ? (user.wishes[0] as { count: number }).count
-            : 0,
-      }
+      const userDoc = snapshot.docs[0]
+      const user = serializeDoc<any>(userDoc)
 
-      return NextResponse.json({ user: withCount })
+      const countSnap = await adminDb.collection('wishes')
+        .where('recipient_id', '==', user.id)
+        .count()
+        .get()
+
+      user.wish_count = countSnap.data().count || 0
+
+      return NextResponse.json({ user })
     }
 
     // ── Users by birthday date ──
@@ -47,33 +55,31 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      const { data: users, error } = await supabase
-        .from('users')
-        .select('*, wishes(count)')
-        .eq('birth_month', m)
-        .eq('birth_day', d)
-        .order('name', { ascending: true })
+      const snapshot = await adminDb.collection('users')
+        .where('birth_month', '==', m)
+        .where('birth_day', '==', d)
+        .get()
 
-      if (error) {
-        console.error('GET /api/users error:', error)
-        return NextResponse.json(
-          { error: 'Failed to fetch users.' },
-          { status: 500 }
-        )
-      }
+      const users = snapshot.docs.map((doc) => serializeDoc<any>(doc))
 
-      const withCounts = (users ?? []).map((u: any) => ({
-        ...u,
-        wish_count:
-          Array.isArray(u.wishes) && u.wishes[0]
-            ? (u.wishes[0] as { count: number }).count
-            : 0,
-      }))
+      const withCounts = await Promise.all(
+        users.map(async (u) => {
+          const countSnap = await adminDb.collection('wishes')
+            .where('recipient_id', '==', u.id)
+            .count()
+            .get()
+          return {
+            ...u,
+            wish_count: countSnap.data().count || 0,
+          }
+        })
+      )
+
+      // Memory sort alphabetically
+      withCounts.sort((a, b) => a.name.localeCompare(b.name))
 
       // Compute offset from today for each user
       const today = new Date()
-      const todayMonth = today.getMonth() + 1
-      const todayDay = today.getDate()
 
       const addDays = (baseDate: Date, n: number) => {
         const nd = new Date(baseDate)
