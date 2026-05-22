@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import Nav from '@/components/Nav'
 import MyPageClient from '@/components/MyPageClient'
 
 export default async function MePage() {
@@ -39,11 +40,14 @@ export default async function MePage() {
     .eq('sender_id', user.id)
 
   return (
-    <MyPageClient
-      profile={profile}
-      wishes={wishes ?? []}
-      twins={twins ?? []}
-      sentCount={sentCount ?? 0}
-    />
+    <>
+      <Nav user={profile} />
+      <MyPageClient
+        profile={profile}
+        wishes={wishes ?? []}
+        twins={twins ?? []}
+        sentCount={sentCount ?? 0}
+      />
+    </>
   )
 }
