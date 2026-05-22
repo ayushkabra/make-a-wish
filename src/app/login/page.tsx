@@ -18,6 +18,9 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   const supabase = createClient()
 
   function switchMode(next: Mode) {
@@ -26,6 +29,8 @@ export default function LoginPage() {
     setSuccessMsg('')
     setPassword('')
     setConfirmPassword('')
+    setShowPassword(false)
+    setShowConfirmPassword(false)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -97,6 +102,8 @@ export default function LoginPage() {
           setEmail('')
           setPassword('')
           setConfirmPassword('')
+          setShowPassword(false)
+          setShowConfirmPassword(false)
         }
       }
     } finally {
@@ -161,32 +168,52 @@ export default function LoginPage() {
           <label className={styles.label} htmlFor="password">
             Password
           </label>
-          <input
-            id="password"
-            className={styles.input}
-            type="password"
-            placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-            required
-          />
+          <div className={styles.inputWrapper}>
+            <input
+              id="password"
+              className={`${styles.input} ${styles.inputWithToggle}`}
+              type={showPassword ? 'text' : 'password'}
+              placeholder={mode === 'signup' ? 'At least 6 characters' : '••••••••'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+              required
+            />
+            <button
+              type="button"
+              className={styles.togglePassword}
+              onClick={() => setShowPassword(!showPassword)}
+              tabIndex={-1}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
 
           {mode === 'signup' && (
             <>
               <label className={styles.label} htmlFor="confirmPassword">
                 Confirm password
               </label>
-              <input
-                id="confirmPassword"
-                className={styles.input}
-                type="password"
-                placeholder="Re-enter your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                required
-              />
+              <div className={styles.inputWrapper}>
+                <input
+                  id="confirmPassword"
+                  className={`${styles.input} ${styles.inputWithToggle}`}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className={styles.togglePassword}
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </>
           )}
 

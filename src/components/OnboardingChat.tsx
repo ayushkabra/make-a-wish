@@ -118,6 +118,7 @@ export default function OnboardingChat() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [authEmail, setAuthEmail] = useState('')
   const [authPassword, setAuthPassword] = useState('')
+  const [showAuthPassword, setShowAuthPassword] = useState(false)
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup')
   const [error, setError] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
@@ -493,14 +494,14 @@ export default function OnboardingChat() {
                   <button
                     type="button"
                     className={`${styles.authTab} ${authMode === 'signup' ? styles.authTabSel : ''}`}
-                    onClick={() => { setAuthMode('signup'); setError(''); setSuccessMsg(''); }}
+                    onClick={() => { setAuthMode('signup'); setError(''); setSuccessMsg(''); setAuthPassword(''); setShowAuthPassword(false); }}
                   >
                     Create account
                   </button>
                   <button
                     type="button"
                     className={`${styles.authTab} ${authMode === 'signin' ? styles.authTabSel : ''}`}
-                    onClick={() => { setAuthMode('signin'); setError(''); setSuccessMsg(''); }}
+                    onClick={() => { setAuthMode('signin'); setError(''); setSuccessMsg(''); setAuthPassword(''); setShowAuthPassword(false); }}
                   >
                     Sign in
                   </button>
@@ -514,14 +515,24 @@ export default function OnboardingChat() {
                   onChange={(e) => setAuthEmail(e.target.value)}
                   autoComplete="email"
                 />
-                <input
-                  type="password"
-                  placeholder={authMode === 'signup' ? 'Password (min 6 chars)' : 'Password'}
-                  className={styles.authInput}
-                  value={authPassword}
-                  onChange={(e) => setAuthPassword(e.target.value)}
-                  autoComplete="current-password"
-                />
+                <div className={styles.authInputWrapper}>
+                  <input
+                    type={showAuthPassword ? 'text' : 'password'}
+                    placeholder={authMode === 'signup' ? 'Password (min 6 chars)' : 'Password'}
+                    className={`${styles.authInput} ${styles.authInputWithToggle}`}
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    className={styles.authTogglePassword}
+                    onClick={() => setShowAuthPassword(!showAuthPassword)}
+                    tabIndex={-1}
+                  >
+                    {showAuthPassword ? 'Hide' : 'Show'}
+                  </button>
+                </div>
 
                 {error && <p className={styles.authError}>{error}</p>}
                 {successMsg && <p className={styles.authSuccess}>{successMsg}</p>}

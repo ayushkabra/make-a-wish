@@ -117,6 +117,39 @@
   color: var(--t3);
 }
 
+.inputWrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.inputWithToggle {
+  margin-bottom: 0 !important;
+  padding-right: 56px !important;
+}
+
+.togglePassword {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t3);
+  cursor: pointer;
+  padding: 4px;
+  user-select: none;
+  transition: color 0.15s ease;
+  line-height: 1;
+}
+
+.togglePassword:hover {
+  color: var(--text);
+}
+
 /* Error */
 .error {
   font-size: 13px;

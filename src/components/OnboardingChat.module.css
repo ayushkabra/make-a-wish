@@ -490,6 +490,39 @@
   border-color: var(--coral);
 }
 
+.authInputWrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.authInputWithToggle {
+  margin-bottom: 0 !important;
+  padding-right: 52px !important;
+}
+
+.authTogglePassword {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t3);
+  cursor: pointer;
+  padding: 4px;
+  user-select: none;
+  transition: color 0.15s ease;
+  line-height: 1;
+}
+
+.authTogglePassword:hover {
+  color: var(--text);
+}
+
 .authError {
   font-size: 12px;
   color: var(--coral);
