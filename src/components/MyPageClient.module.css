@@ -539,12 +539,35 @@
   margin-top: 20px;
 }
 
+.checklistTitleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  gap: 12px;
+}
+
 .checklistTitle {
   font-family: 'Fraunces', serif;
   font-size: 18px;
   font-weight: 400;
   color: var(--text);
-  margin-bottom: 6px;
+}
+
+.btnBackToFeed {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--coral);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.15s;
+}
+
+.btnBackToFeed:hover {
+  text-decoration: underline;
+  transform: translateX(-2px);
 }
 
 .checklistSub {

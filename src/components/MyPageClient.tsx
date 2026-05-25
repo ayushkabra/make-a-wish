@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { auth } from '@/lib/firebase/client'
 import { signOut } from 'firebase/auth'
 import styles from './MyPageClient.module.css'
@@ -258,7 +259,10 @@ export default function MyPageClient({ profile, wishes: initialWishes, twins, se
 
           {/* Resolutions Checklist Card */}
           <div className={styles.checklistCard}>
-            <div className={styles.checklistTitle}>🎯 Birthday Resolutions Checklist</div>
+            <div className={styles.checklistTitleRow}>
+              <div className={styles.checklistTitle}>🎯 Birthday Resolutions Checklist</div>
+              <Link href="/feed" className={styles.btnBackToFeed}>← Back to Feed</Link>
+            </div>
             <p className={styles.checklistSub}>
               Track private personal goals for your upcoming year of life. Visible only to you.
             </p>

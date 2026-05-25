@@ -93,7 +93,10 @@ export default function FeedClient({
             {/* Active resolutions preview */}
             {currentUser.resolutions && currentUser.resolutions.length > 0 && (
               <div className={styles.homeResolutions}>
-                <div className={styles.homeResolutionsTitle}>Active Resolutions</div>
+                <div className={styles.homeResolutionsHeader}>
+                  <span className={styles.homeResolutionsTitle}>Active Resolutions</span>
+                  <Link href="/me" className={styles.homeResEditLink}>+ Add More</Link>
+                </div>
                 <div className={styles.homeResolutionsList}>
                   {currentUser.resolutions.filter((r) => !r.completed).slice(0, 3).map((r) => (
                     <div key={r.id} className={styles.homeResolutionItem}>
