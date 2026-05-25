@@ -90,6 +90,30 @@ export default function FeedClient({
                 `Mark your calendar: ${MONTH_NAMES[currentUser.birth_month - 1]} ${currentUser.birth_day}. We can't wait to celebrate you!`
               )}
             </div>
+            {/* Active resolutions preview */}
+            {currentUser.resolutions && currentUser.resolutions.length > 0 && (
+              <div className={styles.homeResolutions}>
+                <div className={styles.homeResolutionsTitle}>Active Resolutions</div>
+                <div className={styles.homeResolutionsList}>
+                  {currentUser.resolutions.filter((r) => !r.completed).slice(0, 3).map((r) => (
+                    <div key={r.id} className={styles.homeResolutionItem}>
+                      <span className={styles.homeResDot}>✦</span> {r.text}
+                    </div>
+                  ))}
+                  {currentUser.resolutions.filter((r) => !r.completed).length > 3 && (
+                    <div className={styles.homeResolutionsMore}>
+                      + {currentUser.resolutions.filter((r) => !r.completed).length - 3} more goals on your dashboard
+                    </div>
+                  )}
+                  {currentUser.resolutions.filter((r) => !r.completed).length === 0 && (
+                    <div className={styles.homeResolutionsDone}>
+                      🎉 All yearly resolutions completed!
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <Link href="/me" className={styles.countdownLink}>
               View my birthday wall →
             </Link>
