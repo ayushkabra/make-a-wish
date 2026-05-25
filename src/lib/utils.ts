@@ -130,3 +130,36 @@ export function timeAgo(dateStr: string): string {
 export function formatBirthday(month: number, day: number): string {
   return `${MONTH_NAMES[month - 1]} ${day}`
 }
+
+/**
+ * Maps technical Firebase Auth error messages/codes into highly readable user-facing strings.
+ */
+export function formatAuthError(err: any): string {
+  const message = err?.message || ''
+  const code = err?.code || ''
+
+  if (code === 'auth/email-already-in-use' || message.includes('auth/email-already-in-use')) {
+    return 'This email address is already in use. Try switching to the "Sign in" tab instead!'
+  }
+  if (code === 'auth/invalid-email' || message.includes('auth/invalid-email')) {
+    return 'Please enter a valid email address.'
+  }
+  if (code === 'auth/weak-password' || message.includes('auth/weak-password')) {
+    return 'Your password should be at least 6 characters long.'
+  }
+  if (
+    code === 'auth/wrong-password' ||
+    message.includes('auth/wrong-password') ||
+    code === 'auth/user-not-found' ||
+    message.includes('auth/user-not-found') ||
+    code === 'auth/invalid-credential' ||
+    message.includes('auth/invalid-credential')
+  ) {
+    return 'Incorrect email or password. Please try again.'
+  }
+  if (code === 'auth/too-many-requests' || message.includes('auth/too-many-requests')) {
+    return 'Too many login attempts. Access has been temporarily disabled. Try again later.'
+  }
+
+  return err?.message || 'Authentication failed. Please check your credentials.'
+}

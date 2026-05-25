@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@/lib/firebase/client'
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
+import { formatAuthError } from '@/lib/utils'
 import styles from './page.module.css'
 
 type Mode = 'signin' | 'signup'
@@ -106,7 +107,7 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       console.error(err)
-      setError(err.message || 'Authentication failed. Please check credentials.')
+      setError(formatAuthError(err))
     } finally {
       setLoading(false)
     }

@@ -15,6 +15,15 @@ function addDays(date: Date, n: number): Date {
   return d
 }
 
+function serializeDoc<T>(doc: any): T {
+  const data = doc.data()
+  const serialized = { ...data, id: doc.id }
+  if (serialized.created_at && typeof serialized.created_at.toDate === 'function') {
+    serialized.created_at = serialized.created_at.toDate().toISOString()
+  }
+  return serialized as T
+}
+
 // Fetch users whose birthday is on a specific month/day
 async function fetchByDate(
   month: number,
@@ -27,10 +36,7 @@ async function fetchByDate(
 
   if (snapshot.empty) return []
 
-  const people = snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  })) as User[]
+  const people = snapshot.docs.map((doc) => serializeDoc<User>(doc))
 
   const peopleWithCount = await Promise.all(
     people.map(async (u) => {
@@ -58,10 +64,7 @@ export default async function FeedPage() {
       const decodedClaims = await adminAuth.verifySessionCookie(session, true)
       const userDoc = await adminDb.collection('users').doc(decodedClaims.uid).get()
       if (userDoc.exists) {
-        currentUser = {
-          id: userDoc.id,
-          ...userDoc.data(),
-        } as User
+        currentUser = serializeDoc<User>(userDoc)
       }
     } catch (e) {
       console.error('Session verification error:', e)

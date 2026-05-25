@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { auth } from '@/lib/firebase/client'
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
 import { getZodiac } from '@/lib/zodiac'
+import { formatAuthError } from '@/lib/utils'
 import styles from './OnboardingChat.module.css'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -337,7 +338,7 @@ export default function OnboardingChat() {
       router.refresh()
     } catch (err: any) {
       console.error(err)
-      setError(err.message || 'An unexpected error occurred.')
+      setError(formatAuthError(err))
       setIsSaving(false)
     }
   }
