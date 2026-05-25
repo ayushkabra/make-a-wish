@@ -58,10 +58,16 @@ export default async function PublicProfilePage({ params }: PageProps) {
   // Fetch wishes for the person
   const wishesSnap = await adminDb.collection('wishes')
     .where('recipient_id', '==', person.id)
-    .orderBy('created_at', 'desc')
     .get()
 
   const wishes: Wish[] = wishesSnap.docs.map((doc) => serializeDoc<Wish>(doc))
+
+  // Sort wishes in memory in descending order of created_at
+  wishes.sort((a, b) => {
+    const timeA = new Date(a.created_at).getTime()
+    const timeB = new Date(b.created_at).getTime()
+    return timeB - timeA
+  })
 
   const initials = getInitials(person.name)
   const avatarColor = getAvatarColor(0)

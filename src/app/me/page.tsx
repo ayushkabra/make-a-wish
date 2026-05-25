@@ -37,7 +37,6 @@ export default async function MePage() {
   const [wishesSnap, repliesSnap, twinsSnap, sentCountSnap] = await Promise.all([
     adminDb.collection('wishes')
       .where('recipient_id', '==', uid)
-      .orderBy('created_at', 'desc')
       .get(),
     adminDb.collection('replies')
       .where('from_id', '==', uid)
@@ -69,6 +68,13 @@ export default async function MePage() {
     const wish = serializeDoc<any>(doc)
     wish.replies = repliesMap.get(wish.id) || []
     return wish as Wish
+  })
+
+  // Sort wishes in memory to avoid requiring a custom Firestore composite index
+  wishes.sort((a, b) => {
+    const dateA = new Date(a.created_at).getTime()
+    const dateB = new Date(b.created_at).getTime()
+    return dateB - dateA
   })
 
   // Process twins

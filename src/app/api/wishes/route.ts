@@ -120,7 +120,6 @@ export async function GET(request: NextRequest) {
     const [wishesSnap, repliesSnap] = await Promise.all([
       adminDb.collection('wishes')
         .where('recipient_id', '==', recipientId)
-        .orderBy('created_at', 'desc')
         .get(),
       adminDb.collection('replies')
         .where('from_id', '==', recipientId)
@@ -143,6 +142,13 @@ export async function GET(request: NextRequest) {
       const wish = serializeDoc<any>(doc)
       wish.replies = repliesMap.get(wish.id) || []
       return wish
+    })
+
+    // Sort wishes in memory in descending order of created_at
+    wishes.sort((a, b) => {
+      const timeA = new Date(a.created_at).getTime()
+      const timeB = new Date(b.created_at).getTime()
+      return timeB - timeA
     })
 
     return NextResponse.json({ wishes })
