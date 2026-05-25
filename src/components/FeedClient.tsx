@@ -5,7 +5,7 @@ import Link from 'next/link'
 import styles from './FeedClient.module.css'
 import PersonCard from './PersonCard'
 import WishModal from './WishModal'
-import { getAvatarColor } from '@/lib/utils'
+import { getAvatarColor, daysUntilBirthday, MONTH_NAMES } from '@/lib/utils'
 import type { User } from '@/types'
 
 interface PersonWithCount extends User {
@@ -72,6 +72,42 @@ export default function FeedClient({
 
   return (
     <div className={styles.wrap}>
+      {/* Dynamic Birthday Countdown for Logged in Users */}
+      {currentUser && (
+        <div className={styles.countdownCard}>
+          <div className={styles.countdownLeft}>
+            <div className={styles.countdownTitle}>
+              {currentUser.birth_month === (today.getMonth() + 1) && currentUser.birth_day === today.getDate() ? (
+                <>Happy Birthday, <span>{currentUser.name}</span>! 🎂</>
+              ) : (
+                <>Hey <span>{currentUser.name}</span>, your birthday is coming up!</>
+              )}
+            </div>
+            <div className={styles.countdownSub}>
+              {currentUser.birth_month === (today.getMonth() + 1) && currentUser.birth_day === today.getDate() ? (
+                "Today is your special day! Check your wall to read wishes and reply to them."
+              ) : (
+                `Mark your calendar: ${MONTH_NAMES[currentUser.birth_month - 1]} ${currentUser.birth_day}. We can't wait to celebrate you!`
+              )}
+            </div>
+            <Link href="/me" className={styles.countdownLink}>
+              View my birthday wall →
+            </Link>
+          </div>
+
+          {!(currentUser.birth_month === (today.getMonth() + 1) && currentUser.birth_day === today.getDate()) && (
+            <div className={styles.countdownRight}>
+              <div className={styles.daysCircle}>
+                <span className={styles.daysNumber}>
+                  {daysUntilBirthday(currentUser.birth_month, currentUser.birth_day)}
+                </span>
+                <span className={styles.daysLabel}>days left</span>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Date header */}
       <div className={styles.dateLine}>{dateLabel}</div>
       <div className={styles.headline}>

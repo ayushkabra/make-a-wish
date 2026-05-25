@@ -121,3 +121,110 @@
   font-size: 14px;
   margin-top: 10px;
 }
+
+/* ─── Birthday Countdown Card ─── */
+.countdownCard {
+  background: linear-gradient(135deg, var(--cl) 0%, var(--card) 100%);
+  border: 1px solid var(--bd);
+  border-radius: var(--r);
+  padding: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 20px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.countdownLeft {
+  flex: 1;
+}
+
+.countdownTitle {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+
+.countdownTitle span {
+  color: var(--coral);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.countdownSub {
+  font-size: 13px;
+  color: var(--t2);
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
+.countdownLink {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--coral);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: transform 0.15s;
+}
+
+.countdownLink:hover {
+  transform: translateX(3px);
+}
+
+.countdownRight {
+  flex-shrink: 0;
+}
+
+.daysCircle {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: var(--card);
+  border: 1px solid var(--bd);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+}
+
+.daysNumber {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--coral);
+  line-height: 1;
+}
+
+.daysLabel {
+  font-size: 9px;
+  color: var(--t3);
+  margin-top: 1px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .countdownCard {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    padding: 18px;
+    gap: 16px;
+  }
+
+  .daysCircle {
+    width: 62px;
+    height: 62px;
+  }
+
+  .daysNumber {
+    font-size: 20px;
+  }
+}

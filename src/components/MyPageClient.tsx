@@ -27,6 +27,73 @@ export default function MyPageClient({ profile, wishes: initialWishes, twins, se
   const [wishes, setWishes] = useState<Wish[]>(initialWishes)
   const [copied, setCopied] = useState(false)
 
+  // ── Resolutions Checklist State & Handlers ──
+  const [resolutions, setResolutions] = useState<any[]>(profile.resolutions || [])
+  const [newResText, setNewResText] = useState('')
+  const [savingRes, setSavingRes] = useState(false)
+
+  async function handleAddResolution(e: React.FormEvent) {
+    e.preventDefault()
+    const text = newResText.trim()
+    if (!text) return
+
+    setSavingRes(true)
+    const newItem = {
+      id: Math.random().toString(36).slice(2, 9),
+      text,
+      completed: false,
+      created_at: new Date().toISOString()
+    }
+
+    const updatedList = [...resolutions, newItem]
+    setResolutions(updatedList)
+    setNewResText('')
+
+    try {
+      await fetch('/api/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resolutions: updatedList }),
+      })
+    } catch (err) {
+      console.error('Failed to save resolution:', err)
+    } finally {
+      setSavingRes(false)
+    }
+  }
+
+  async function handleToggleResolution(id: string) {
+    const updatedList = resolutions.map((item) =>
+      item.id === id ? { ...item, completed: !item.completed } : item
+    )
+    setResolutions(updatedList)
+
+    try {
+      await fetch('/api/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resolutions: updatedList }),
+      })
+    } catch (err) {
+      console.error('Failed to save resolution toggle:', err)
+    }
+  }
+
+  async function handleDeleteResolution(id: string) {
+    const updatedList = resolutions.filter((item) => item.id !== id)
+    setResolutions(updatedList)
+
+    try {
+      await fetch('/api/me', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resolutions: updatedList }),
+      })
+    } catch (err) {
+      console.error('Failed to delete resolution:', err)
+    }
+  }
+
   async function handleSignOut() {
     await signOut(auth)
     await fetch('/api/auth/session', { method: 'DELETE' })
@@ -187,6 +254,89 @@ export default function MyPageClient({ profile, wishes: initialWishes, twins, se
             <button className={styles.btnCopy} onClick={copyLink}>
               {copied ? '✓ Copied!' : 'Copy link'}
             </button>
+          </div>
+
+          {/* Resolutions Checklist Card */}
+          <div className={styles.checklistCard}>
+            <div className={styles.checklistTitle}>🎯 Birthday Resolutions Checklist</div>
+            <p className={styles.checklistSub}>
+              Track private personal goals for your upcoming year of life. Visible only to you.
+            </p>
+
+            {/* Progress bar */}
+            {resolutions.length > 0 && (
+              <div className={styles.progressSection}>
+                <div className={styles.progressInfo}>
+                  <span>
+                    {resolutions.filter((r) => r.completed).length} of {resolutions.length} completed
+                  </span>
+                  <span>
+                    {Math.round(
+                      (resolutions.filter((r) => r.completed).length / resolutions.length) * 100
+                    )}%
+                  </span>
+                </div>
+                <div className={styles.progressBarBg}>
+                  <div
+                    className={styles.progressBarFill}
+                    style={{
+                      width: `${(resolutions.filter((r) => r.completed).length / resolutions.length) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Input field */}
+            <form onSubmit={handleAddResolution} className={styles.checklistForm}>
+              <input
+                type="text"
+                placeholder="I want to learn playing guitar..."
+                className={styles.checklistInput}
+                value={newResText}
+                onChange={(e) => setNewResText(e.target.value)}
+                maxLength={100}
+                disabled={savingRes}
+              />
+              <button type="submit" className={styles.btnChecklistAdd} disabled={savingRes}>
+                Add
+              </button>
+            </form>
+
+            {/* List */}
+            {resolutions.length === 0 ? (
+              <div className={styles.checklistEmpty}>
+                No resolutions added yet. Add your first yearly goal above!
+              </div>
+            ) : (
+              <div className={styles.checklistList}>
+                {resolutions.map((item) => (
+                  <div
+                    key={item.id}
+                    className={`${styles.checklistItem} ${item.completed ? styles.completed : ''}`}
+                  >
+                    <label className={styles.checkboxLabel}>
+                      <input
+                        type="checkbox"
+                        checked={item.completed}
+                        onChange={() => handleToggleResolution(item.id)}
+                        className={styles.checkboxInput}
+                      />
+                      <span className={styles.customCheckbox} />
+                      <span className={styles.itemText}>{item.text}</span>
+                    </label>
+                    <button
+                      type="button"
+                      className={styles.btnDelete}
+                      onClick={() => handleDeleteResolution(item.id)}
+                      title="Delete goal"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

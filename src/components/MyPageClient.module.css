@@ -529,3 +529,197 @@
   color: var(--t3);
   line-height: 1.6;
 }
+
+/* ── RESOLUTIONS CHECKLIST ── */
+.checklistCard {
+  background: var(--card);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--r);
+  padding: 22px;
+  margin-top: 20px;
+}
+
+.checklistTitle {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.checklistSub {
+  font-size: 13px;
+  color: var(--t2);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.progressSection {
+  margin-bottom: 22px;
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--t2);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.progressBarBg {
+  background: var(--bg);
+  border-radius: 4px;
+  height: 6px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  background: var(--coral);
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease-in-out;
+}
+
+.checklistForm {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.checklistInput {
+  flex: 1;
+  border: 0.5px solid var(--bd);
+  border-radius: var(--rs);
+  padding: 8px 12px;
+  font-size: 13.5px;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.15s;
+}
+
+.checklistInput:focus {
+  border-color: var(--cm);
+  outline: none;
+}
+
+.btnChecklistAdd {
+  background: var(--coral);
+  color: white;
+  border: none;
+  border-radius: var(--rs);
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btnChecklistAdd:hover {
+  background-color: #b03f1e;
+}
+
+.btnChecklistAdd:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checklistEmpty {
+  text-align: center;
+  padding: 24px 10px;
+  font-size: 13px;
+  color: var(--t3);
+  border: 0.5px dashed var(--bd);
+  border-radius: var(--rs);
+}
+
+.checklistList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 0.5px solid var(--bd);
+  border-radius: var(--rs);
+  transition: all 0.2s;
+}
+
+.checklistItem.completed {
+  opacity: 0.65;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  width: 90%;
+  user-select: none;
+}
+
+.checkboxInput {
+  display: none;
+}
+
+.customCheckbox {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--t3);
+  border-radius: 4px;
+  background: white;
+  display: inline-block;
+  position: relative;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.checkboxInput:checked + .customCheckbox {
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+.checkboxInput:checked + .customCheckbox::after {
+  content: "✓";
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+}
+
+.itemText {
+  font-size: 13.5px;
+  color: var(--text);
+  transition: text-decoration 0.2s;
+  word-break: break-word;
+}
+
+.completed .itemText {
+  text-decoration: line-through;
+  color: var(--t2);
+}
+
+.btnDelete {
+  background: none;
+  border: none;
+  color: var(--t3);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+
+.btnDelete:hover {
+  color: #ef4444;
+}

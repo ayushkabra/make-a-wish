@@ -108,7 +108,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     // Whitelist editable fields
-    const allowed = ['name', 'city', 'bio', 'vibe', 'notif_pref'] as const
+    const allowed = ['name', 'city', 'bio', 'vibe', 'notif_pref', 'resolutions'] as const
     const updates: Partial<Record<(typeof allowed)[number], unknown>> = {}
     for (const key of allowed) {
       if (key in body) updates[key] = body[key]

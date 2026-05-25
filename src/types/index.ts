@@ -1,3 +1,10 @@
+export interface Resolution {
+  id: string
+  text: string
+  completed: boolean
+  created_at: string
+}
+
 export interface User {
   id: string
   name: string
@@ -9,6 +16,7 @@ export interface User {
   vibe?: string
   created_at: string
   wish_count?: number
+  resolutions?: Resolution[]
 }
 
 export interface Reply {
